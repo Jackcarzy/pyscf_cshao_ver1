@@ -34,7 +34,7 @@ from pyscf.dft import numint
 from pyscf import __config__
 
 
-def get_veff(ks, mol=None, dm=None, dm_last=0, vhf_last=0, hermi=1):
+def get_veff(ks, mol=None, dm=None, dm_last=0, vhf_last=0, hermi=1, KSCED=False, dm_b=None):
     '''Coulomb + XC functional
 
     .. note::
@@ -73,11 +73,28 @@ def get_veff(ks, mol=None, dm=None, dm_last=0, vhf_last=0, hermi=1):
     ground_state = (isinstance(dm, numpy.ndarray) and dm.ndim == 2)
 
     ni = ks._numint
+    if KSCED is True:
+        dm_a = dm
+        dm = dm + dm_b
     if hermi == 2:  # because rho = 0
         n, exc, vxc = 0, 0, 0
     else:
         max_memory = ks.max_memory - lib.current_memory()[0]
-        n, exc, vxc = ni.nr_rks(mol, ks.grids, ks.xc, dm, max_memory=max_memory)
+
+        if KSCED is True:
+            n, exc, vxc = ni.nr_rks(mol, ks.grids, ks.xc, dm, max_memory=max_memory)
+            nnad_ab, excnad_ab, vnad_ab = ni.nr_rks(mol, ks.grids, 'LDA_K_TF', dm, max_memory=max_memory)
+            nnad_a, excnad_a, vnad_a = ni.nr_rks(mol, ks.grids, 'LDA_K_TF', dm_a, max_memory=max_memory)
+            nnad_b, excnad_b, vnad_b = ni.nr_rks(mol, ks.grids, 'LDA_K_TF', dm_b, max_memory=max_memory)
+            n_b, exc_b, vxc_b = ni.nr_rks(mol, ks.grids, ks.xc, dm_b, max_memory=max_memory)
+
+            vxc = vxc + vnad_ab - vnad_a
+            exc = exc + excnad_ab - excnad_a - excnad_b - exc_b
+            print('Exc_ab:',exc)
+            print('Exc_b:',exc_b)
+            print('Tnad:',excnad_ab - excnad_a - excnad_b)  
+        else:
+            n, exc, vxc = ni.nr_rks(mol, ks.grids, ks.xc, dm, max_memory=max_memory)
         logger.debug(ks, 'nelec by numeric integration = %s', n)
         if ks.nlc or ni.libxc.is_nlc(ks.xc):
             if ni.libxc.is_nlc(ks.xc):
@@ -99,8 +116,10 @@ def get_veff(ks, mol=None, dm=None, dm_last=0, vhf_last=0, hermi=1):
             ddm = numpy.asarray(dm) - numpy.asarray(dm_last)
             vj = ks.get_j(mol, ddm, hermi)
             vj += vhf_last.vj
+#            print('1')
         else:
             vj = ks.get_j(mol, dm, hermi)
+#            print('2')
         vxc += vj
     else:
         omega, alpha, hyb = ni.rsh_and_hybrid_coeff(ks.xc, spin=mol.spin)
@@ -127,10 +146,13 @@ def get_veff(ks, mol=None, dm=None, dm_last=0, vhf_last=0, hermi=1):
         if ground_state:
             exc -= numpy.einsum('ij,ji', dm, vk).real * .5 * .5
 
-    if ground_state:
+    if KSCED is True:
+        ecoul = numpy.einsum('ij,ji', dm_a, vj).real*.5
+    elif ground_state:
         ecoul = numpy.einsum('ij,ji', dm, vj).real * .5
     else:
         ecoul = None
+   # print('ecoul:',ecoul)
 
     vxc = lib.tag_array(vxc, ecoul=ecoul, exc=exc, vj=vj, vk=vk)
     return vxc
@@ -260,6 +282,7 @@ def define_xc_(ks, description, xctype='LDA', hyb=0, rsh=(0,0,0)):
     ks._numint = libxc.define_xc_(ks._numint, description, xctype, hyb, rsh)
     return ks
 
+
 def _dft_common_init_(mf, xc='LDA,VWN'):
     raise DeprecationWarning
 
@@ -320,12 +343,10 @@ class KohnShamDFT:
     -76.415443079840458
     '''
 
-    _keys = {'xc', 'nlc', 'grids', 'disp', 'disp_with_3body', 'nlcgrids', 'small_rho_cutoff'}
+    _keys = {'xc', 'nlc', 'grids', 'nlcgrids', 'small_rho_cutoff'}
 
     def __init__(self, xc='LDA,VWN'):
         self.xc = xc
-        self.disp = None
-        self.disp_with_3body = None
         self.nlc = ''
         self.grids = gen_grid.Grids(self.mol)
         self.grids.level = getattr(
@@ -532,4 +553,9 @@ class RKS(KohnShamDFT, hf.RHF):
         '''Convert to RHF object.'''
         return self._transfer_attrs_(self.mol.RHF())
 
-    to_gpu = lib.to_gpu
+    def to_gpu(self):
+        from gpu4pyscf.dft.rks import RKS
+        obj = lib.to_gpu(hf.SCF.reset(self.view(RKS)))
+        # Attributes only defined in gpu4pyscf.RKS
+        obj.screen_tol = 1e-14
+        return obj
