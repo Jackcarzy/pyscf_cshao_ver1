@@ -202,8 +202,8 @@ Keyword argument "init_dm" is replaced by "dm0"''')
             e_coulab_half = numpy.einsum('ij,ji->', mf.get_j(mol,dm_b),dm).real * 0.5
             e_tot = e_tot + e_coulab_half
             #print('h1e:', h1e)
-            print('j_b:', mf.get_j(mol,dm_b))
-            print('j_a:', mf.get_j(mol,dm))
+            #print('j_b:', mf.get_j(mol,dm_b))
+            #print('j_a:', mf.get_j(mol,dm))
         else:
             vhf = mf.get_veff(mol, dm, dm_last, vhf)
             e_tot = mf.energy_tot(dm, h1e, vhf)
