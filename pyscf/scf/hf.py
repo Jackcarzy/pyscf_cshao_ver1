@@ -141,6 +141,20 @@ Keyword argument "init_dm" is replaced by "dm0"''')
         vhf = mf.get_veff(mol,dm)
 
     e_tot = mf.energy_tot(dm, h1e, vhf)
+    
+    if KSCED is True:
+        if mol._pseudo:
+            vne_a = gto.pp_int.get_gth_pp(mol)
+        else:
+            vne_a = mol.intor_symmetric('int1e_nuc')
+        if len(mol._ecpbas) > 0:
+            vne_a += mol.intor_symmetric('ECPscalar')
+        e_nuca_eleb = numpy.einsum('ij,ji->', vne_a, dm_b).real
+        e_tot += e_nuca_eleb
+        e_coulab_half = numpy.einsum('ij,ji->', mf.get_j(mol,dm_b),dm).real * 0.5
+        e_tot = e_tot + e_coulab_half
+
+
     logger.info(mf, 'init E= %.15g', e_tot)
 
     scf_conv = False
@@ -201,6 +215,15 @@ Keyword argument "init_dm" is replaced by "dm0"''')
             e_tot = mf.energy_tot(dm, h1e, vhf)
             e_coulab_half = numpy.einsum('ij,ji->', mf.get_j(mol,dm_b),dm).real * 0.5
             e_tot = e_tot + e_coulab_half
+            if mol._pseudo:
+                vne_a = gto.pp_int.get_gth_pp(mol)
+            else:
+                vne_a = mol.intor_symmetric('int1e_nuc')
+            if len(mol._ecpbas) > 0:
+                vne_a += mol.intor_symmetric('ECPscalar')
+            e_nuca_eleb = numpy.einsum('ij,ji->', vne_a, dm_b).real
+            e_tot += e_nuca_eleb
+            
             #print('h1e:', h1e)
             #print('j_b:', mf.get_j(mol,dm_b))
             #print('j_a:', mf.get_j(mol,dm))
