@@ -31,7 +31,7 @@ mol = gto.M(
  Au         2.6602599614        1.7610685840       -0.7061032025
  Au        -1.5101592036       -2.8708963231        0.9263808113
  Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'}, ecp = {'Au': 'lanl2dz'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'}, ecp = {'Au': 'lanl2dz'})
 mf = dft.RKS(mol,xc='PBE').density_fit(auxbasis='def2-universal-jfit')
 mf.init_guess = 'atom'
 mf.kernel()
@@ -66,7 +66,7 @@ X-Au         1.1416264041        2.9819112540        1.2003517037
  Au         2.6602599614        1.7610685840       -0.7061032025
  Au        -1.5101592036       -2.8708963231        0.9263808113
  Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'}, ecp = {'Au': 'lanl2dz'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'}, ecp = {'Au': 'lanl2dz'})
 mfb = dft.RKS(molb,xc='PBE').density_fit(auxbasis='def2-universal-jfit')
 mfb.init_guess = 'atom'
 mfb.kernel()
@@ -105,7 +105,7 @@ X-Au        -3.0199086387        1.5066265186       -0.8695358678
 X-Au         2.6602599614        1.7610685840       -0.7061032025
 X-Au        -1.5101592036       -2.8708963231        0.9263808113
 X-Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'}, ecp = {'Au': 'lanl2dz'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'}, ecp = {'Au': 'lanl2dz'})
 mfa0 = dft.RKS(mola,xc='PBE').density_fit(auxbasis='def2-universal-jfit')
 mfa0.init_guess = 'atom'
 mfa0.kernel()
@@ -144,7 +144,7 @@ X-Au        -3.0199086387        1.5066265186       -0.8695358678
 X-Au         2.6602599614        1.7610685840       -0.7061032025
 X-Au        -1.5101592036       -2.8708963231        0.9263808113
 X-Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'}, ecp = {'Au': 'lanl2dz'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'}, ecp = {'Au': 'lanl2dz'})
 mfa20 = dft.RKS(mola2,xc='PBE').density_fit(auxbasis='def2-universal-jfit')
 mfa20.init_guess = 'atom'
 mfa20.kernel()
@@ -183,7 +183,7 @@ X-Au         1.1416264041        2.9819112540        1.2003517037
 X-Au         2.6602599614        1.7610685840       -0.7061032025
 X-Au        -1.5101592036       -2.8708963231        0.9263808113
 X-Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'})
 mfa3 = dft.RKS(mola3).density_fit(auxbasis='def2-universal-jfit')
 mfa3.xc = 'PBE'
 mfa3.kernel()
@@ -218,7 +218,7 @@ X-H         0.2951098908        6.8927149259        4.1141796447
  Au         2.6602599614        1.7610685840       -0.7061032025
  Au        -1.5101592036       -2.8708963231        0.9263808113
  Au        -2.8798984522       -1.5140630637       -0.9903384805''',
-    basis = {'Au': 'lanl2dz', 'H': '6-31g', 'S': '6-31g', 'C': '6-31g'}, ecp = {'Au': 'lanl2dz'})
+    basis = {'Au': 'lanl2dz', 'H': '6-31g*', 'S': '6-31g*', 'C': '6-31g*'}, ecp = {'Au': 'lanl2dz'})
 mfb2 = dft.RKS(molb2,xc='PBE').density_fit(auxbasis='def2-universal-jfit')
 mfb2.init_guess = 'atom'
 mfb2.kernel()
