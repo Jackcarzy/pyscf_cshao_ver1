@@ -1,7 +1,7 @@
 <div align="left">
   <img src="https://github.com/pyscf/pyscf-doc/blob/master/logo/pyscf-logo.png" height="80px"/>
 </div>
-
+(modified for KSCED-mol calculations)
 Python-based Simulations of Chemistry Framework
 -----------------------------------------------
 [![Build Status](https://github.com/pyscf/pyscf/workflows/CI/badge.svg)](https://github.com/pyscf/pyscf/actions?query=workflow%3ACI)
